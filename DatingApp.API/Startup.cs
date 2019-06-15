@@ -30,6 +30,7 @@ namespace DatingApp.API
         // This method gets called by the runtime. Use this method to add services to the container. 
         public void ConfigureServices(IServiceCollection services)
         {
+            var key = Encoding.ASCII.GetBytes(Configuration.GetSection("AppSettings:Token").Value);
             services.AddDbContext<DataContext>( x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
@@ -45,7 +46,7 @@ namespace DatingApp.API
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration
                             .GetSection("AppSettings:Token").Value)),
                         ValidateIssuer = false,
-                        
+                        ValidateAudience = false,
                     };
                 });
         }
@@ -66,6 +67,7 @@ namespace DatingApp.API
             //app.UseHttpsRedirection();
             app.UseCors("MyPolicy");
             //app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            app.UseAuthentication();
             app.UseMvc();
         }
     }
